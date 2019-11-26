@@ -11,7 +11,7 @@ from torchtext.vocab import pretrained_aliases, Vocab
 import spacy
 from spacy.symbols import ORTH
 
-spacy_en = spacy.load("en")
+spacy_en = spacy.load("en_core_web_sm")
 spacy_en.tokenizer.add_special_case("<mask>", [{ORTH: "<mask>"}])
 
 def set_seed(seed):
@@ -52,6 +52,15 @@ def load_tsv(path, skip_header=True):
         data = [row for row in reader]
     return data
 
+def convert_to_tsv(path):
+    import pandas as pd
+    df = pd.read_csv(path+"/dataset_train.csv")
+    df.columns = ['text', 'label']
+    df.to_csv(path+"/train.tsv", sep='\t', index=False)
+    df = pd.read_csv(path+"/dataset_val.csv")
+    df.columns = ['text', 'label']
+    df.to_csv(path+"/dev.tsv", sep='\t', index=False)
+    
 def load_data(data_dir, tokenizer, vocab=None, batch_first=False, augmented=False, use_teacher=False):
     text_field = data.Field(sequential=True, tokenize=tokenizer, lower=True, include_lengths=True, batch_first=batch_first)
     label_field_class = data.Field(sequential=False, use_vocab=False, dtype=torch.long)
@@ -109,7 +118,7 @@ def get_model_wrapper(model_weights, text_field, device=None):
         lstm_hidden_size=300, classif_hidden_size=400, dropout_rate=0.15).to(device)
     model.load_state_dict(model_weights)
     trainer = LSTMTrainer(model, device)
-    
+
     def model_wrapper(text):
         outputs = trainer.infer_one(text, text_field, softmax=True)
         return {

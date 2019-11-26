@@ -11,7 +11,7 @@ from torchtext.vocab import pretrained_aliases, Vocab
 from transformers import (BertConfig, BertForSequenceClassification, BertTokenizer)
 
 from trainer import BertTrainer
-from utils import set_seed, load_data, BertVocab
+from utils import set_seed, load_data, BertVocab, convert_to_tsv
 
 def save_bert(model, tokenizer, config, output_dir):
     if not os.path.isdir(output_dir):
@@ -47,7 +47,8 @@ if __name__ == "__main__":
     set_seed(args.seed)
     if not os.path.isdir(args.output_dir):
         os.mkdir(args.output_dir)
-
+    if args.data_dir == 'sas':
+        convert_to_tsv(args.data_dir)
     bert_config = BertConfig.from_pretrained("bert-large-uncased", cache_dir=args.cache_dir)
     bert_model = BertForSequenceClassification.from_pretrained("bert-large-uncased", config=bert_config, cache_dir=args.cache_dir).to(device)
     bert_tokenizer = BertTokenizer.from_pretrained("bert-large-uncased", do_lower_case=True, cache_dir=args.cache_dir)
