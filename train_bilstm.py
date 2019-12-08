@@ -135,7 +135,7 @@ if __name__ == "__main__":
     train_dataset, valid_dataset, text_field = load_data(args.data_dir, spacy_tokenizer, augmented=args.augmented, use_teacher=args.use_teacher)
     vocab = text_field.vocab
 
-    model = BiLSTMClassifier(2, len(vocab.itos), vocab.vectors.shape[-1],
+    model = BiLSTMClassifier(4, len(vocab.itos), vocab.vectors.shape[-1],
         lstm_hidden_size=300, classif_hidden_size=400, dropout_rate=0.15).to(device)
     # Initialize word embeddings to fasttext
     model.init_embedding(vocab.vectors.to(device))

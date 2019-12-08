@@ -49,9 +49,11 @@ if __name__ == "__main__":
         os.mkdir(args.output_dir)
     if args.data_dir == 'sas':
         convert_to_tsv(args.data_dir)
-    bert_config = BertConfig.from_pretrained("bert-large-uncased", cache_dir=args.cache_dir)
-    bert_model = BertForSequenceClassification.from_pretrained("bert-large-uncased", config=bert_config, cache_dir=args.cache_dir).to(device)
-    bert_tokenizer = BertTokenizer.from_pretrained("bert-large-uncased", do_lower_case=True, cache_dir=args.cache_dir)
+    bert_config = BertConfig.from_pretrained("bert-base-uncased", cache_dir=args.cache_dir)
+    bert_config.__dict__['num_labels'] = 4
+    print(bert_config)
+    bert_model = BertForSequenceClassification.from_pretrained("bert-base-uncased", config=bert_config, cache_dir=args.cache_dir).to(device)
+    bert_tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True, cache_dir=args.cache_dir)
     train_dataset, valid_dataset, _ = load_data(args.data_dir, bert_tokenizer.tokenize,
         vocab=BertVocab(bert_tokenizer.vocab), batch_first=True)
     
@@ -71,3 +73,4 @@ if __name__ == "__main__":
     print(trainer.evaluate())
 
     save_bert(bert_model, bert_tokenizer, bert_config, args.output_dir)
+

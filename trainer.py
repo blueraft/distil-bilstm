@@ -143,14 +143,17 @@ class Trainer():
     def infer(self, dataset, softmax=False):
         self.model.eval()
         outputs_idx = 0
-        outputs = np.empty(shape=(len(dataset), 2))
+        outputs = np.empty(shape=(len(dataset), 4))
         infer_it = data.Iterator(dataset, self.batch_size, train=False, sort=False, device=self.device)
         for batch in tqdm(infer_it, desc="Inference"):
             with torch.no_grad():
                 batch, _, batch_size = self.process_batch(batch)
+                print(batch)
+                print(**batch.shape)
                 output = self.model(**batch)[0]
                 if softmax:
                     output = F.softmax(output, dim=-1)
+                print(outputs.shape, outputs_idx, outputs_idx+batch_size, output.shape)
                 outputs[outputs_idx:outputs_idx + batch_size] = output.detach().cpu().numpy()
                 outputs_idx += batch_size
                 del output
