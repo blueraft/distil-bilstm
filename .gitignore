@@ -4,3 +4,4 @@ runs/
 weights.pth
 events.*
 *.backup
+.cache/
